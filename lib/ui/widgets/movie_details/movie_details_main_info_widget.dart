@@ -90,7 +90,7 @@ class _MovieNameWidget extends StatelessWidget {
     return RichText(
       maxLines: 3,
       textAlign: TextAlign.center,
-      text: TextSpan(children: [
+      text: const TextSpan(children: [
         TextSpan(
             text: "Tom Clansy`s Without Remorse",
             style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
@@ -110,7 +110,7 @@ class _ScoreWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        TextButton(onPressed: (){}, child: Row(
+        TextButton(onPressed: (){}, child: const Row(
           children: [
             SizedBox(
               width: 50,
@@ -129,7 +129,7 @@ class _ScoreWidget extends StatelessWidget {
           ],
         )),
         Container(color: Colors.grey, width: 1, height: 15,),
-        TextButton(onPressed: (){}, child: Row(
+        TextButton(onPressed: (){}, child: const Row(
           children: [
             Icon(Icons.play_arrow, color: Colors.white,),
             Text("Play Trailer", style: TextStyle(color: Colors.white),)
