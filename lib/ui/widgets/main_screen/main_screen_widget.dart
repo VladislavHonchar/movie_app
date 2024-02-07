@@ -38,7 +38,8 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         children: [
           Text("Index 0: News"),
           NotifierProvider(
-            model: modelMovieList,
+            create: () => modelMovieList,
+            isManagingModel: false,
             child: MovieListWidget()),
           Text("Index 2: TV Shows"),
         ],

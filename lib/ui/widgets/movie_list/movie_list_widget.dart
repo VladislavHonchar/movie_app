@@ -21,6 +21,7 @@ class MovieListWidget extends StatelessWidget {
           itemCount: model.movies.length,
           itemExtent: 163,
           itemBuilder: (BuildContext context, int index){
+            model.showMovieAtIndex(index);
             final movie = model.movies[index];
             final posterPath = movie.posterPath;
             final releaseDate = movie.releaseDate;
@@ -93,6 +94,7 @@ class MovieListWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(10.0),
           child: TextField(
+            onChanged: model.searchMovie,
             decoration: InputDecoration(
               labelText: 'Search',
               filled: true,

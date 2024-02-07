@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:movie_app/domain/api_client/api_client.dart';
+import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/elements/radial_percent_widget.dart';
+import 'package:movie_app/ui/widgets/movie_details/movie_details_module.dart';
 
 class MovieDetailsMainInfoWidget extends StatelessWidget {
   const MovieDetailsMainInfoWidget({super.key});
@@ -9,22 +13,22 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
     return  Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _TopPostersWidget(),
-        Padding(
-          padding: const EdgeInsets.all(20.0),
+        const _TopPostersWidget(),
+        const Padding(
+          padding: EdgeInsets.all(20.0),
           child: _MovieNameWidget(),
         ),
-        _ScoreWidget(),
-        _SummeryWidget(),
-        Padding(
+        const _ScoreWidget(),
+        const _SummeryWidget(),
+        const Padding(
           padding: EdgeInsets.all(10.0),
           child: _OverviewWidget(),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.all(10.0),
           child: _DescriptionWidget(),
         ),
-        SizedBox(height: 30,),
+        const SizedBox(height: 30,),
         _PeopleWidget(),
         
       ],
@@ -39,9 +43,10 @@ class _DescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-        "За много лет до того, как стать тираническим президентом Панема, 18-летний Кориолан Сноу — последняя надежда своего угасающего рода, некогда гордой семьи, потерявшей благородство в послевоенном Капитолии. С приближением 10-х ежегодных Голодных игр молодой Сноу встревожен, когда его назначают наставником Люси Грей Бэрд, девушки-трибуна из бедного Дистрикта 12. Но после того, как Люси Грей привлекает внимание всего Панема, дерзко спев во время церемонии жатвы, Сноу думает, что сможет переломить ситуацию в свою пользу. Объединив свои инстинкты шоумена и политическую смекалку, Сноу и Люси Грей попадают в водоворот событий в борьбе за выживание. В конечном итоге они выяснят, кто из них певчая птица, а кто змея...",
-        style: TextStyle(
+    final movieDetails = NotifierProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+    
+    return Text(movieDetails?.overview ?? '',
+        style: const TextStyle(
             color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),);
   }
 }
@@ -53,7 +58,7 @@ class _OverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return const Text(
       "Overview",
       style: TextStyle(
           color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
@@ -66,19 +71,27 @@ class _TopPostersWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      Image(
-        image: AssetImage("images/background.jpg"),
-      ),
-      Positioned(
-        top: 20,
-        left: 20,
-        bottom: 20,
-        child: Image(
-          image: AssetImage("images/avatar.jpg"),
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    final backdropPath = model?.movieDetails?.backdropPath;
+    final posterPath = model?.movieDetails?.posterPath;
+    // ApiClient.imageUrl(backdropPath);
+    return  AspectRatio(
+      aspectRatio: 390 / 219,
+      child: Stack(
+        children: [
+        backdropPath != null 
+        ? Image.network(ApiClient.imageUrl(backdropPath)) 
+        : const SizedBox.shrink(),
+        Positioned(
+          top: 20,
+          left: 20,
+          bottom: 20,
+          child: posterPath != null 
+          ? Image.network(ApiClient.imageUrl(posterPath)) 
+          : const SizedBox.shrink(),
         ),
-      ),
-    ]);
+      ]),
+    );
   }
 }
 
@@ -87,17 +100,22 @@ class _MovieNameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      maxLines: 3,
-      textAlign: TextAlign.center,
-      text: const TextSpan(children: [
-        TextSpan(
-            text: "Tom Clansy`s Without Remorse",
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
-        TextSpan(
-            text: "(2021)",
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400)),
-      ]),
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    var year = model?.movieDetails?.releaseDate?.year.toString();
+    year = year != null ? ' ($year)' : '';
+    return Center(
+      child: RichText(
+        maxLines: 3,
+        textAlign: TextAlign.center,
+        text: TextSpan(children: [
+          TextSpan(
+              text: model?.movieDetails?.title ?? '',
+              style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
+          TextSpan(
+              text: year,
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w400)),
+        ]),
+      ),
     );
   }
 }
@@ -107,25 +125,28 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final movieDetails = NotifierProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+    var voteAverage = movieDetails?.voteAverage ?? 0;
+    voteAverage = voteAverage * 10;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        TextButton(onPressed: (){}, child: const Row(
+        TextButton(onPressed: (){}, child:  Row(
           children: [
             SizedBox(
               width: 50,
               height: 50,
               child: RadialPercentWidget(
-                child: Text('72%', style: TextStyle(color: Colors.white),),
-                percent: 0.72,
-                fillColor: Color.fromARGB(255, 20, 23, 35),
-                freeColor: Color.fromARGB(255, 25, 54, 31),
-                lineColor: Color.fromARGB(255, 37, 203, 103),
+                percent: voteAverage / 100,
+                fillColor: const Color.fromARGB(255, 20, 23, 35),
+                freeColor: const Color.fromARGB(255, 25, 54, 31),
+                lineColor: const Color.fromARGB(255, 37, 203, 103),
                 lineWidth: 3,
+                child: Text( "${voteAverage.toStringAsFixed(0)}%", style: TextStyle(color: Colors.white),),
                 ),
             ),
-            SizedBox(width: 10,),
-            Text("User Score", style: TextStyle(color: Colors.white),)
+            const SizedBox(width: 10,),
+            const Text("User Score", style: TextStyle(color: Colors.white),)
           ],
         )),
         Container(color: Colors.grey, width: 1, height: 15,),
@@ -146,15 +167,38 @@ class _SummeryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Color.fromRGBO(22, 21, 25, 1),
+    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    if(model == null) return const SizedBox.shrink();
+    var texts = <String>[];
+    final releaseDate = model.movieDetails?.releaseDate;
+    if(releaseDate != null){
+      texts.add(model.stringFromDate(releaseDate));
+    }
+    final productionCountries = model.movieDetails?.productionCountries;
+    if(productionCountries != null && productionCountries.isNotEmpty){
+      texts.add('(${productionCountries.first.iso})');
+    }
+    final runtime = model.movieDetails?.runtime ?? 0;
+    final duration = Duration(minutes: runtime);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    texts.add('${hours}h ${minutes}m');
+    final genres  = model.movieDetails?.genres;
+    if(genres != null && genres.isNotEmpty){
+      var genresNames = <String>[];
+      for (var genr in genres) {
+        genresNames.add(genr.name);
+      }
+    texts.add(genresNames.join(', '));
+    }
+    return  ColoredBox(
+      color: const Color.fromRGBO(22, 21, 25, 1),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 70),
-        child: Text(
-          "R, 04/29/2021 (US) 1h 49m Action, Adventure, Thriller, War",
+        padding: const  EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        child: Text(texts.join(' '),
           maxLines: 3,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.w400),
         ),
       ),
@@ -163,13 +207,13 @@ class _SummeryWidget extends StatelessWidget {
 }
 
 class _PeopleWidget extends StatelessWidget {
-   _PeopleWidget({super.key});
-  final nameStyle =TextStyle(
+  _PeopleWidget({super.key});
+  final nameStyle = const TextStyle(
               color: Colors.white, 
               fontSize: 16, 
               fontWeight: FontWeight.w400);
 
-  final jobTitleStyle = TextStyle(
+  final jobTitleStyle = const TextStyle(
               color: Colors.white, 
               fontSize: 16, fontWeight: 
               FontWeight.w400);

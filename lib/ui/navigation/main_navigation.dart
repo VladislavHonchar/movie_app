@@ -4,6 +4,7 @@ import 'package:movie_app/ui/widgets/auth/auth_model.dart';
 import 'package:movie_app/ui/widgets/auth/auth_widget.dart';
 import 'package:movie_app/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:movie_app/ui/widgets/main_screen/main_screen_widget.dart';
+import 'package:movie_app/ui/widgets/movie_details/movie_details_module.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_widget.dart';
 
 abstract class MainNavigationRouteName{
@@ -16,10 +17,12 @@ class MainNavigation{
   String initialRoute(bool isAuth) => isAuth ? MainNavigationRouteName.mainScreen : MainNavigationRouteName.auth;
   final routes = <String, Widget Function(BuildContext)>{
    MainNavigationRouteName.auth: (context) => NotifierProvider(
-          model: AuthModel(), 
+          create:() => AuthModel(), 
           child: const AuthWidget()
           ),
-  MainNavigationRouteName.mainScreen: (context) => NotifierProvider(model: MainScreenModel(), child: const MainScreenWidget()) 
+  MainNavigationRouteName.mainScreen: (context) => NotifierProvider(
+    create: () => MainScreenModel(), 
+    child: const MainScreenWidget()) 
   };
   Route<Object> onGenerateRoute(RouteSettings settings) {
     switch(settings.name){
@@ -27,7 +30,10 @@ class MainNavigation{
       final arguments = settings.arguments;
       final movieId = arguments is int ? arguments : 0;
       return MaterialPageRoute(
-        builder: (context) => MovieDetailWidget(movieId: movieId),
+        builder: (context) => NotifierProvider(
+          create: () => MovieDetailsModel(movieId: movieId), 
+          child: const MovieDetailWidget()
+        ),
       );
       default:
       const widget = Text('Navigation error!!!!!');
