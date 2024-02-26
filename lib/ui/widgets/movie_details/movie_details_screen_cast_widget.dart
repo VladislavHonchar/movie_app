@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/domain/api_client/api_client.dart';
+import 'package:movie_app/config/configuration.dart';
+import 'package:movie_app/domain/api_client/movie_api_client.dart';
 import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_module.dart';
 
@@ -63,6 +64,7 @@ class _ActorListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const _imageURL = Configuration.imageUrl;
     final model = NotifierProvider.read<MovieDetailsModel>(context);
     final actor = model?.movieDetails?.credits.cast[actorIndex];
     final profilePath = actor?.profilePath;
@@ -88,7 +90,7 @@ class _ActorListItemWidget extends StatelessWidget {
               child: Column(
                 children: [
                   profilePath != null 
-                  ? Image.network(ApiClient.imageUrl(profilePath))
+                  ? Image.network('$_imageURL$profilePath')
                   : const SizedBox.shrink(),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

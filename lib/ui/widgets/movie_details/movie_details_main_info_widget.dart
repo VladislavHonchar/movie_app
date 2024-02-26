@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:movie_app/domain/api_client/api_client.dart';
+import 'package:movie_app/config/configuration.dart';
+import 'package:movie_app/domain/api_client/movie_api_client.dart';
+import 'package:movie_app/domain/api_client/image_downloader.dart';
 import 'package:movie_app/domain/entity/movie_details_casts.dart';
 import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/elements/radial_percent_widget.dart';
@@ -88,14 +90,14 @@ class _TopPostersWidget extends StatelessWidget {
       aspectRatio: 390 / 219,
       child: Stack(children: [
         backdropPath != null
-            ? Image.network(ApiClient.imageUrl(backdropPath))
+            ? Image.network(ImageDownloader.imageUrl(backdropPath))
             : const SizedBox.shrink(),
         Positioned(
           top: 20,
           left: 20,
           bottom: 20,
           child: posterPath != null
-              ? Image.network(ApiClient.imageUrl(posterPath))
+              ? Image.network(ImageDownloader.imageUrl(posterPath))
               : const SizedBox.shrink(),
         ),
         Positioned(

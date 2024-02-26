@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/domain/api_client/api_client.dart';
+import 'package:movie_app/config/configuration.dart';
+import 'package:movie_app/domain/api_client/movie_api_client.dart';
 import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/ui/widgets/movie_list/movie_list_model.dart';
 import 'package:intl/intl.dart';
@@ -25,6 +26,7 @@ class MovieListWidget extends StatelessWidget {
             final movie = model.movies[index];
             final posterPath = movie.posterPath;
             final releaseDate = movie.releaseDate;
+            const _imageURL = Configuration.imageUrl;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Stack(
@@ -45,7 +47,7 @@ class MovieListWidget extends StatelessWidget {
                       clipBehavior: Clip.hardEdge,
                     child: Row(
                       children: [
-                        posterPath !=  null ?  Image.network(ApiClient.imageUrl(posterPath), width: 95) : const SizedBox.shrink(),//Image(image: AssetImage(movie.imageName)),
+                        posterPath !=  null ?  Image.network('$_imageURL$posterPath', width: 95) : const SizedBox.shrink(),//Image(image: AssetImage(movie.imageName)),
                         const SizedBox(width: 15,),
                         Expanded(
                           child: Column(

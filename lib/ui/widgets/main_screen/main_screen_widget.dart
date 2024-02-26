@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
+import 'package:movie_app/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:movie_app/ui/widgets/movie_list/movie_list_model.dart';
 import 'package:movie_app/ui/widgets/movie_list/movie_list_widget.dart';
+import 'package:provider/provider.dart';
 
 class MainScreenWidget extends StatefulWidget {
   const MainScreenWidget({super.key});
@@ -36,7 +38,11 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       body: IndexedStack(
         index: _selectedTab,
         children: [
-          Text("Index 0: News"),
+         ChangeNotifierProvider(
+          create: (_) => MainScreenModel(),
+          lazy: false,
+           child: const _LogOutButton()
+         ),
           NotifierProvider(
             create: () => modelMovieList,
             isManagingModel: false,
@@ -57,5 +63,22 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
         onTap: onSelectTab,
       ),
     );
+  }
+}
+
+class _LogOutButton extends StatelessWidget {
+  const _LogOutButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final model = context.read<MainScreenModel>();
+    return Column(
+             children: [
+              ElevatedButton(
+                onPressed:()=> model.makeLogOutOnPressButton(context), 
+                child: const Text('Logout')),
+               const Text("Index 0: News"),
+             ],
+           );
   }
 }

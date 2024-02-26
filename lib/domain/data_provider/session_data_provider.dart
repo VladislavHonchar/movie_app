@@ -1,3 +1,4 @@
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class _Keys{
@@ -8,7 +9,10 @@ abstract class _Keys{
 class SessionDataProvider {
   static const _secureStorage = FlutterSecureStorage();
   
+  Future<void> deleteSessionId() => _secureStorage.delete(key: _Keys.sessionId);
   Future<String?> getSessionId() => _secureStorage.read(key: _Keys.sessionId);
+  
+  
   Future<void> setSessionId(String? value) {
     if (value != null){
       return _secureStorage.write(key: _Keys.sessionId, value: value);
