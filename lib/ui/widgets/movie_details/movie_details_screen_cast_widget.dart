@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/config/configuration.dart';
-import 'package:movie_app/domain/api_client/movie_api_client.dart';
-import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_module.dart';
+import 'package:provider/provider.dart';
 
 class MovieDdetailsMainScreenCastWidget extends StatelessWidget {
   const MovieDdetailsMainScreenCastWidget({super.key});
@@ -19,7 +18,7 @@ class MovieDdetailsMainScreenCastWidget extends StatelessWidget {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
           ),
         ),
-        Scrollbar(
+        const Scrollbar(
           child: SizedBox(
             height: 240,
             child: _ActorListWidget(),
@@ -41,11 +40,10 @@ class _ActorListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    var cast = model?.movieDetails?.credits.cast;
-    if (cast == null || cast.isEmpty) return const SizedBox.shrink();
+    var data = context.select((MovieDetailsModel model) => model.data.actorData);
+    if(data.isEmpty) return const SizedBox.shrink();
     return ListView.builder(
-      itemCount: 20,
+      itemCount: data.length,
       itemExtent: 120,
       scrollDirection: Axis.horizontal,
       itemBuilder: (BuildContext context, int index) {
@@ -65,9 +63,9 @@ class _ActorListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const _imageURL = Configuration.imageUrl;
-    final model = NotifierProvider.read<MovieDetailsModel>(context);
-    final actor = model?.movieDetails?.credits.cast[actorIndex];
-    final profilePath = actor?.profilePath;
+    final model = context.read<MovieDetailsModel>();
+    final actor = model.data.actorData[actorIndex];
+    final profilePath = actor.profilePath;
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: DecoratedBox(
@@ -83,20 +81,19 @@ class _ActorListItemWidget extends StatelessWidget {
                     offset: const Offset(0, 2))
               ]),
           child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
             clipBehavior: Clip.hardEdge,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  profilePath != null 
-                  ? Image.network('$_imageURL$profilePath')
-                  : const SizedBox.shrink(),
+                  if(profilePath != null) 
+                   Image.network('$_imageURL$profilePath'),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        actor!.name,
+                        actor.name,
                         maxLines: 1,
                       ),
                       const SizedBox(

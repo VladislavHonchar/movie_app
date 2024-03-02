@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/domain/library/widgets/inherited/provider.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_main_info_widget.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_module.dart';
 import 'package:movie_app/ui/widgets/movie_details/movie_details_screen_cast_widget.dart';
-import 'package:movie_app/ui/widgets/my_app/my_app_module.dart';
+import 'package:provider/provider.dart';
+
 
 class MovieDetailWidget extends StatefulWidget {
   const MovieDetailWidget({super.key});
@@ -16,16 +16,11 @@ class _MovieDetailWidgetState extends State<MovieDetailWidget> {
   
 
   @override
-  void initState() {
-    super.initState();
-    final model = NotifierProvider.read<MovieDetailsModel>(context);
-    final appModel = Provider.read<MyAppModel>(context);
-    model?.onSessionExpired = () => appModel?.resetSession(context);
-  }
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    NotifierProvider.read<MovieDetailsModel>(context)?.setupLocale(context);
+    Future.microtask(() => 
+    context.read<MovieDetailsModel>().setupLocale(context)
+    );
   }
   
   
@@ -36,7 +31,7 @@ class _MovieDetailWidgetState extends State<MovieDetailWidget> {
         title:  const _TitleWidget()
       ),
       body: const ColoredBox(
-        color: const Color.fromRGBO(24, 23, 27, 1),
+        color: Color.fromRGBO(24, 23, 27, 1),
         child:  _BodyWidget(),
       ),
     );
@@ -48,9 +43,8 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final model = NotifierProvider.watch<MovieDetailsModel>(context);
-     final movieDetails = model?.movieDetails;
-     if(movieDetails == null){
+     final isLoading = context.select((MovieDetailsModel model) => model.data.isLoading);
+     if(isLoading){
       return const  Center(
         child: CircularProgressIndicator());
      }
@@ -69,10 +63,10 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    return Text(model?.movieDetails?.title ?? "Завантаження...",
+    final title = context.select((MovieDetailsModel model) => model.data.title);
+    return Text(title,
     textAlign: TextAlign.center,
-    style: TextStyle(
+    style: const TextStyle(
       color: Colors.white,
     ),);
   }
