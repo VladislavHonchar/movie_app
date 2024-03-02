@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:movie_app/domain/entity/movie.dart';
 import 'package:movie_app/domain/library/paginator.dart';
+import 'package:movie_app/domain/library/widgets/localable_widget/localalized_model.dart';
 import 'package:movie_app/domain/services/movie_service.dart';
 import 'package:movie_app/ui/navigation/main_navigation.dart';
 
@@ -28,7 +29,7 @@ class MovieListViewModel extends ChangeNotifier{
   late final Paginator<Movie> _popularMoviePaginator ;
   late final Paginator<Movie> _searchMoviePaginator ;
   Timer? _searchDebounce;
-  late String _locale = '';
+  final _localeStorage = LocalizedModelStorage();
 
   var _movies = <MovieListRowData>[];
   String? _searchQuery;
@@ -47,7 +48,7 @@ class MovieListViewModel extends ChangeNotifier{
 
   MovieListViewModel(){
     _popularMoviePaginator = Paginator((page) async{
-      final result = await _movieService.popularMovie(page, _locale);
+      final result = await _movieService.popularMovie(page, _localeStorage.localTag);
       return PaginatorLoadResult(
         data: result.movies, 
         currentPage: result.page, 
@@ -55,7 +56,7 @@ class MovieListViewModel extends ChangeNotifier{
         );
     });
     _searchMoviePaginator = Paginator((page) async{
-      final result = await _movieService.searchMovie(page, _locale, _searchQuery ?? '');
+      final result = await _movieService.searchMovie(page, _localeStorage.localTag, _searchQuery ?? '');
       return PaginatorLoadResult(
         data: result.movies, 
         currentPage: result.page, 
@@ -64,11 +65,9 @@ class MovieListViewModel extends ChangeNotifier{
     });
   }
 
-  Future<void> setupLocale(BuildContext context) async{
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    if(_locale == locale) return;
-    _locale = locale;
-    _dateFormat = DateFormat.yMMMMd(locale);
+  Future<void> setupLocale(Locale locale) async{
+    if(!_localeStorage.updateLocale(locale)) return;
+    _dateFormat = DateFormat.yMMMMd(locale.toLanguageTag());
     await _resetList();
   }
 
