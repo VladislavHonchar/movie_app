@@ -11,7 +11,6 @@ class MainScreenWidget extends StatefulWidget {
 
 class _MainScreenWidgetState extends State<MainScreenWidget> {
   int _selectedTab = 0;
-  final modelMovieList = MovieListViewModel();
   final _screenFactory = ScreenFactory();
   
   void onSelectTab(int index) {
