@@ -12,9 +12,9 @@ class CustomPaintWidget extends StatefulWidget {
 class _CustomPaintWidgetState extends State<CustomPaintWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: Container(
+        child: SizedBox(
           width: 100,
           height: 100,
           child: RadialPercentWidget(

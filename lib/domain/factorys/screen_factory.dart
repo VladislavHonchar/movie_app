@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movie_app/ui/widgets/auth/auth_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_app/domain/blocs/auth_bloc.dart';
+import 'package:movie_app/ui/widgets/auth/auth_view_cubit.dart';
 import 'package:movie_app/ui/widgets/auth/auth_widget.dart';
-import 'package:movie_app/ui/widgets/loader_widget/loader_view_model.dart';
+import 'package:movie_app/ui/widgets/loader_widget/loader_view_cubit.dart';
 import 'package:movie_app/ui/widgets/loader_widget/loader_widget.dart';
 import 'package:movie_app/ui/widgets/main_screen/main_screen_model.dart';
 import 'package:movie_app/ui/widgets/main_screen/main_screen_widget.dart';
@@ -15,22 +17,44 @@ import 'package:movie_app/ui/widgets/tv_shows_widget/tv_shows_widget.dart';
 import 'package:provider/provider.dart';
 
 class ScreenFactory {
+  AuthBloc? _authBloc;
+  
   Widget makeLoader(){
-    return Provider(
-      create: (context) => LoaderViewModel(context), 
-      lazy: false,
+    final authBloc = _authBloc ?? AuthBloc(AuthCheckStatusInProgressState());
+    return BlocProvider<LoaderViewCubit>(
+      create: (context) => LoaderViewCubit(LoaderViewCubitState.unknow, authBloc), 
       child: const LoaderWidget()
       );
   }
+  // Widget makeLoader(){
+  //   return Provider(
+  //     create: (context) => LoaderViewModel(context), 
+  //     lazy: false,
+  //     child: const LoaderWidget()
+  //     );
+  // }
 
   Widget makeAuth(){
-    return ChangeNotifierProvider(
-      create: (_) => AuthModel(),
+    final authBloc = _authBloc ?? AuthBloc(AuthCheckStatusInProgressState());
+    _authBloc = authBloc;
+
+    return BlocProvider<AuthViewCubit>(
+      create: (_) => AuthViewCubit(
+        AuthViewCubitFormFillInProgressState(),
+        authBloc
+      ),
       child: const AuthWidget(),
-      );
+    );
+
+    // return ChangeNotifierProvider(
+    //   create: (_) => AuthModel(),
+    //   child: const AuthWidget(),
+    //   );
   }
 
   Widget makeMainScreen(){
+    _authBloc?.close();
+    _authBloc = null;
     return  const MainScreenWidget();
   }
 
